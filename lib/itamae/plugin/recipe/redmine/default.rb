@@ -1,10 +1,12 @@
-require_relative 'version'
+include_recipe 'postgresql'
 
+require_relative 'version'
 version = ENV['REDMINE_VERSION'] || Itamae::Plugin::Recipe::Redmine::REDMINE_VERSION
 
 %w{
   ImageMagick
   ImageMagick-devel
+  expect
   ipa-pgothic-fonts
   libcurl-devel
   libffi-devel  
@@ -60,16 +62,30 @@ execute "build redmine-#{version}" do
   not_if "test -e /opt/redmine/redmine-#{version}/INSTALLED"
 end
 
-%w{
-  configuration.yml
-  database.yml
-}.each do |name|
-  template "/opt/redmine/redmine-#{version}/config/#{name}" do
-    user 'root'
-    owner 'redmine'
-    group 'redmine'
-    mode '644'
-  end
+template "/opt/redmine/redmine-#{version}/config/configuration.yml" do
+  user 'root'
+  owner 'redmine'
+  group 'redmine'
+  mode '644'
+end
+
+template "/opt/redmine/redmine-#{version}/config/database.yml" do
+  user 'root'
+  owner 'redmine'
+  group 'redmine'
+  mode '644'
+  variables redmine_password: ENV['REDMINE_PASSWORD'] || 'redmine'
+end
+
+execute 'createuser' do
+  user 'postgres'
+  command "#{::File.join(File.dirname(__FILE__), 'create_user.sh')} #{ENV['REDMINE_PASSWORD'] || 'redmine'}"
+  not_if "psql -c \"select * from pg_user where usename = 'redmine';\" | grep redmine"
+end
+
+execute 'createdb -E UTF-8 -l ja_JP.UTF-8 -O redmine -T template0 redmine' do
+  user 'postgres'
+  not_if "psql -c \"select * from pg_database where datname = 'redmine';\" | grep redmine"
 end
 
 gem_package 'bundler' do
@@ -78,8 +94,26 @@ gem_package 'bundler' do
 end
 
 execute 'bundle _1.17.3_ install --without development test --path vendor/bundle' do
-  cwd "/opt/redmine/redmine-#{version}"
   user 'redmine'
+  cwd "/opt/redmine/redmine-#{version}"
+  command <<-EOF
+    set -eu
+    bundle _1.17.3_ install --without development test --path vendor/bundle
+    touch BUNDLED
+  EOF
+  not_if "test -e /opt/redmine/redmine-#{version}/BUNDLED"
+end
+
+execute 'redmine initialization' do
+  user 'redmine'
+  cwd "/opt/redmine/redmine-#{version}"
+  command <<-EOF
+    set -eu
+    bundle exec rake generate_secret_token
+    bundle exec rake db:migrate RAILS_ENV=production
+    touch INITIALIZED
+  EOF
+  not_if "test -e /opt/redmine/redmine-#{version}/INITIALIZED"
 end
 
 link 'current' do

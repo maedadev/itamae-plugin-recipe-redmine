@@ -3,4 +3,4 @@ production:
   database: redmine
   host: localhost
   username: redmine
-  password: redmine
+  password: <%%= ENV['REDMINE_PASSWORD'] || '<%= @redmine_password %>' %>
