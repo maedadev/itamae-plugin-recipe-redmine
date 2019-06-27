@@ -78,8 +78,7 @@ template "/opt/redmine/redmine-#{version}/config/database.yml" do
 end
 
 execute 'createuser' do
-  user 'postgres'
-  command "#{::File.join(File.dirname(__FILE__), 'create_user.sh')} #{ENV['REDMINE_PASSWORD'] || 'redmine'}"
+  command "sh #{::File.join(File.dirname(__FILE__), 'create_user.sh')} #{ENV['REDMINE_PASSWORD'] || 'redmine'}"
   not_if "psql -c \"select * from pg_user where usename = 'redmine';\" | grep redmine"
 end
 

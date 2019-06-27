@@ -2,7 +2,7 @@
 
 expect -c "
   set timeout 5
-  spawn LANG=en.en_US createuser -P redmine
+  spawn sudo -u postgres LANG=en.en_US createuser -P redmine
 
   expect \"Enter password for new role\"
   send \"$1\n\"
