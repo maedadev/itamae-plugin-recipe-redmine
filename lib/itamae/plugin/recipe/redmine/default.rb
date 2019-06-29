@@ -20,23 +20,17 @@ version = ENV['REDMINE_VERSION'] || Itamae::Plugin::Recipe::Redmine::REDMINE_VER
   end
 end
 
-user 'redmine' do
-  user 'root'
-  system_user true
-  home '/opt/redmine/current'
-end
-
 directory '/opt/redmine' do
   user 'root'
-  owner 'redmine'
-  group 'redmine'
+  owner ENV['USER']
+  group ENV['USER']
   mode '755'
 end
 
 directory '/opt/redmine/tmp' do
   user 'root'
   owner ENV['USER']
-  group 'redmine'
+  group ENV['USER']
   mode '755'
 end
 
@@ -54,32 +48,30 @@ execute "build redmine-#{version}" do
     set -eu
     rm -Rf redmine-#{version}/
     tar zxf redmine-#{version}.tar.gz
-    sudo rm -Rf /opt/redmine/redmine-#{version}/
-    sudo mv redmine-#{version} /opt/redmine/
-    sudo chown -R redmine:redmine /opt/redmine/redmine-#{version}
-    sudo -u redmine touch /opt/redmine/redmine-#{version}/INSTALLED
+    rm -Rf /opt/redmine/redmine-#{version}/
+    mv redmine-#{version} /opt/redmine/
+    touch /opt/redmine/redmine-#{version}/INSTALLED
   EOF
   not_if "test -e /opt/redmine/redmine-#{version}/INSTALLED"
 end
 
 template "/opt/redmine/redmine-#{version}/config/configuration.yml" do
   user 'root'
-  owner 'redmine'
-  group 'redmine'
+  owner ENV['USER']
+  group ENV['USER']
   mode '644'
 end
 
 template "/opt/redmine/redmine-#{version}/config/database.yml" do
-  user 'root'
-  owner 'redmine'
-  group 'redmine'
+  owner ENV['USER']
+  group ENV['USER']
   mode '644'
   variables redmine_password: ENV['REDMINE_PASSWORD'] || 'redmine'
 end
 
 execute 'createuser' do
   command "sh #{::File.join(File.dirname(__FILE__), 'create_user.sh')} #{ENV['REDMINE_PASSWORD'] || 'redmine'}"
-  not_if "psql -c \"select * from pg_user where usename = 'redmine';\" | grep redmine"
+  not_if "sudo -u postgres psql -c \"select * from pg_user where usename = 'redmine';\" | grep redmine"
 end
 
 execute 'createdb -E UTF-8 -l ja_JP.UTF-8 -O redmine -T template0 redmine' do
@@ -93,7 +85,6 @@ gem_package 'bundler' do
 end
 
 execute 'bundle _1.17.3_ install --without development test --path vendor/bundle' do
-  user 'redmine'
   cwd "/opt/redmine/redmine-#{version}"
   command <<-EOF
     set -eu
@@ -104,7 +95,6 @@ execute 'bundle _1.17.3_ install --without development test --path vendor/bundle
 end
 
 execute 'redmine initialization' do
-  user 'redmine'
   cwd "/opt/redmine/redmine-#{version}"
   command <<-EOF
     set -eu
