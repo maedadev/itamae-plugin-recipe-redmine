@@ -1,5 +1,3 @@
-include_recipe 'postgresql'
-
 require_relative 'version'
 version = ENV['REDMINE_VERSION'] || Itamae::Plugin::Recipe::Redmine::REDMINE_VERSION
 
@@ -68,6 +66,8 @@ template "/opt/redmine/redmine-#{version}/config/database.yml" do
   mode '644'
   variables redmine_password: ENV['REDMINE_PASSWORD'] || 'redmine'
 end
+
+include_recipe 'postgresql'
 
 execute 'createuser' do
   command "sh #{::File.join(File.dirname(__FILE__), 'create_user.sh')} #{ENV['REDMINE_PASSWORD'] || 'redmine'}"
