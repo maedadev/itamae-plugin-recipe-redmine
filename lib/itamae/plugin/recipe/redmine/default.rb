@@ -60,49 +60,14 @@ template "/opt/redmine/redmine-#{version}/config/configuration.yml" do
   mode '644'
 end
 
-template "/opt/redmine/redmine-#{version}/config/database.yml" do
-  owner ENV['USER']
-  group ENV['USER']
-  mode '644'
-  variables redmine_password: ENV['REDMINE_PASSWORD'] || 'redmine'
-end
-
-include_recipe 'postgresql'
-
-execute 'createuser' do
-  command "sh #{::File.join(File.dirname(__FILE__), 'create_user.sh')} #{ENV['REDMINE_PASSWORD'] || 'redmine'}"
-  not_if "sudo -u postgres psql -c \"select * from pg_user where usename = 'redmine';\" | grep redmine"
-end
-
-execute 'createdb -E UTF-8 -l ja_JP.UTF-8 -O redmine -T template0 redmine' do
-  user 'postgres'
-  not_if "psql -c \"select * from pg_database where datname = 'redmine';\" | grep redmine"
-end
-
-gem_package 'bundler' do
-  user 'root'
-  version '1.17.3'
-end
-
-execute 'bundle _1.17.3_ install --without development test --path vendor/bundle' do
+execute 'bundle install --without development test --path vendor/bundle' do
   cwd "/opt/redmine/redmine-#{version}"
   command <<-EOF
     set -eu
-    bundle _1.17.3_ install --without development test --path vendor/bundle
+    bundle install --without development test --path vendor/bundle
     touch BUNDLED
   EOF
   not_if "test -e /opt/redmine/redmine-#{version}/BUNDLED"
-end
-
-execute 'redmine initialization' do
-  cwd "/opt/redmine/redmine-#{version}"
-  command <<-EOF
-    set -eu
-    bundle exec rake generate_secret_token
-    bundle exec rake db:migrate RAILS_ENV=production
-    touch INITIALIZED
-  EOF
-  not_if "test -e /opt/redmine/redmine-#{version}/INITIALIZED"
 end
 
 link 'current' do
