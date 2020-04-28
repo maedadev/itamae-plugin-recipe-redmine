@@ -6,8 +6,8 @@ module Itamae
 
         REDMINE_VERSION = [
           REDMINE_VERSION_MAJOR = '4',
-          REDMINE_VERSION_MINOR = '0',
-          REDMINE_VERSION_PATCH = '3'
+          REDMINE_VERSION_MINOR = '1',
+          REDMINE_VERSION_PATCH = '1'
         ].join('.')
       end
     end
