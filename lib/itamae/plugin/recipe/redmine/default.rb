@@ -1,5 +1,6 @@
 require_relative 'version'
 version = ENV['REDMINE_VERSION'] || Itamae::Plugin::Recipe::Redmine::REDMINE_VERSION
+insecure = ENV['INSECURE'] ? '--no-check-certificate' : ''
 
 %w{
   ImageMagick
@@ -35,9 +36,9 @@ end
 execute "download redmine-#{version}" do
   cwd '/opt/redmine/tmp'
   command <<-EOF
-    wget http://www.redmine.org/releases/redmine-#{version}.tar.gz
+    wget #{insecure} https://www.redmine.org/releases/redmine-#{version}.tar.gz
   EOF
-  not_if "test -e /opt/redmine/redmine-#{version}/INSTALLED || echo #{::File.read(::File.join(::File.dirname(__FILE__), "redmine-#{version}_sha256sum.txt")).strip} | sha256sum -c"
+  #not_if "test -e /opt/redmine/redmine-#{version}/INSTALLED || echo #{::File.read(::File.join(::File.dirname(__FILE__), "redmine-#{version}_sha256sum.txt")).strip} | sha256sum -c"
 end
 
 execute "build redmine-#{version}" do
