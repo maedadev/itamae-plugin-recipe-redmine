@@ -38,7 +38,7 @@ execute "download redmine-#{version}" do
   command <<-EOF
     wget #{insecure} https://www.redmine.org/releases/redmine-#{version}.tar.gz
   EOF
-  #not_if "test -e /opt/redmine/redmine-#{version}/INSTALLED || echo #{::File.read(::File.join(::File.dirname(__FILE__), "redmine-#{version}_sha256sum.txt")).strip} | sha256sum -c"
+  not_if "test -e /opt/redmine/redmine-#{version}/INSTALLED || echo #{::File.read(::File.join(::File.dirname(__FILE__), "redmine-#{version}_sha256sum.txt")).strip} | sha256sum -c"
 end
 
 execute "build redmine-#{version}" do
