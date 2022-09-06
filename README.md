@@ -21,10 +21,12 @@ Or install it yourself as:
 ## Usage
 
 from command line:
+
     $ itamae local -n redmine::default    # dry-run
     $ itamae local    redmine::default    # real-run
 
 from recipe:
+
     include_recipe 'redmine'
 
 ## Development

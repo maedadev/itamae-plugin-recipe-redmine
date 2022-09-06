@@ -1,12 +1,12 @@
 diff --git a/config/application.rb b/config/application.rb
-index c40a580..e748028 100644
+index 1905b45..4316f1a 100644
 --- a/config/application.rb
 +++ b/config/application.rb
-@@ -80,6 +80,7 @@ module RedmineApp
-     config.session_store :cookie_store,
+@@ -81,6 +81,7 @@ module RedmineApp
+       :cookie_store,
        :key => '_redmine_session',
        :path => config.relative_url_root || '/',
 +      :secure => true,
        :same_site => :lax
+     )
  
-     if File.exists?(File.join(File.dirname(__FILE__), 'additional_environment.rb'))
