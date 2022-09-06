@@ -79,8 +79,12 @@ link 'current' do
 end
 
 patch_file = "#{File.dirname(__FILE__)}/files/application.rb.diff"
-execute 'apply patch to config.session_store :cookie_store ... secure:true' do
-  command "patch -p1                <#{patch_file}"
-  not_if  "patch -p1 -Rsf --dry-run <#{patch_file}"
-  cwd     '/opt/redmine/current'
+if version == '4.2.7'
+  execute 'apply patch to config.session_store :cookie_store ... secure:true' do
+    command "patch -p1                <#{patch_file}"
+    not_if  "patch -p1 -Rsf --dry-run <#{patch_file}"
+    cwd     '/opt/redmine/current'
+  end
+else
+  Itamae.logger.warn "patch(#{patch_file}) is just for redmine #{version}, skipped."
 end
