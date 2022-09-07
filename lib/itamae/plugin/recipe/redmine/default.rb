@@ -79,7 +79,7 @@ link 'current' do
 end
 
 patch_file = "#{File.dirname(__FILE__)}/files/application.rb.diff"
-if version == '4.2.7'
+if version == '4.2.6'
   execute 'apply patch to config.session_store :cookie_store ... secure:true' do
     command "patch -p1                <#{patch_file}"
     not_if  "patch -p1 -Rsf --dry-run <#{patch_file}"

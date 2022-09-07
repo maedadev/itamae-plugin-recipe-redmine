@@ -2,12 +2,12 @@ module Itamae
   module Plugin
     module Recipe
       module Redmine
-        VERSION = "0.2.0"
+        VERSION = "0.2.1"
 
         REDMINE_VERSION = [
           REDMINE_VERSION_MAJOR = '4',
           REDMINE_VERSION_MINOR = '2',
-          REDMINE_VERSION_PATCH = '7'
+          REDMINE_VERSION_PATCH = '6'
         ].join('.')
       end
     end
