@@ -67,7 +67,7 @@ if ENV['GEMFILE_LOCAL'] || version == '4.1.7'
     owner ENV['USER']
     group ENV['USER']
     mode '644'
-    source ENV['GEMFILE_LOCAL'] || 'Gemfile.local'
+    source ENV['GEMFILE_LOCAL'] || ::File.join(::File.dirname(__FILE__), 'templates/Gemfile.local.erb')
   end
 end
 
