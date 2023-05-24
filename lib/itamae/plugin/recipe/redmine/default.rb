@@ -61,6 +61,16 @@ template "/opt/redmine/redmine-#{version}/config/configuration.yml" do
   mode '644'
 end
 
+if ENV['GEMFILE_LOCAL'] || version == '4.1.7'
+  template "/opt/redmine/redmine-#{version}/Gemfile.local" do
+    user 'root'
+    owner ENV['USER']
+    group ENV['USER']
+    mode '644'
+    source ENV['GEMFILE_LOCAL'] || 'Gemfile.local'
+  end
+end
+
 execute 'bundle install --without development test --path vendor/bundle' do
   cwd "/opt/redmine/redmine-#{version}"
   command <<-EOF
