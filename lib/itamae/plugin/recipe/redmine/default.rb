@@ -71,11 +71,12 @@ if ENV['GEMFILE_LOCAL'] || version == '4.1.7'
   end
 end
 
-execute 'bundle install --without development test --path vendor/bundle' do
+execute 'bundle install' do
   cwd "/opt/redmine/redmine-#{version}"
   command <<-EOF
     set -eu
-    bundle install --without development test --path vendor/bundle
+    bundle config set --local without 'itamae development test'
+    bundle install -j2 --path vendor/bundle
     touch BUNDLED
   EOF
   not_if "test -e /opt/redmine/redmine-#{version}/BUNDLED"
@@ -86,15 +87,4 @@ link 'current' do
   cwd '/opt/redmine'
   to "redmine-#{version}"
   force true
-end
-
-patch_file = "#{File.dirname(__FILE__)}/files/application.rb.diff"
-if version == '4.2.6'
-  execute 'apply patch to config.session_store :cookie_store ... secure:true' do
-    command "patch -p1                <#{patch_file}"
-    not_if  "patch -p1 -Rsf --dry-run <#{patch_file}"
-    cwd     '/opt/redmine/current'
-  end
-else
-  Itamae.logger.warn "patch(#{patch_file}) is just for redmine #{version}, skipped."
 end

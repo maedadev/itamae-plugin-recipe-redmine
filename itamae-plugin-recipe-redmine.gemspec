@@ -5,8 +5,8 @@ require "itamae/plugin/recipe/redmine/version"
 Gem::Specification.new do |spec|
   spec.name          = "itamae-plugin-recipe-redmine"
   spec.version       = Itamae::Plugin::Recipe::Redmine::VERSION
-  spec.authors       = ["y-matsuda"]
-  spec.email         = ["matsuda@lab.acs-jp.com"]
+  spec.authors       = ["y.matsuda"]
+  spec.email         = ["y.matsuda@bizside.biz"]
 
   spec.summary       = %q{itamae recipe to ease redmine installation}
   spec.description   = %q{itamae recipe to ease redmine installation}
