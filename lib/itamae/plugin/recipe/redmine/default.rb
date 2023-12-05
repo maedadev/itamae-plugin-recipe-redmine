@@ -76,7 +76,7 @@ execute 'bundle install' do
   command <<-EOF
     set -eu
     bundle config set --local without 'itamae development test'
-    bundle install -j2 --path vendor/bundle
+    bundle install -j2
     touch BUNDLED
   EOF
   not_if "test -e /opt/redmine/redmine-#{version}/BUNDLED"
