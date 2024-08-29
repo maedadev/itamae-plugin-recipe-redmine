@@ -2,7 +2,7 @@ module Itamae
   module Plugin
     module Recipe
       module Redmine
-        VERSION = '0.2.5'
+        VERSION = '0.2.6'
 
         REDMINE_VERSION = [
           REDMINE_VERSION_MAJOR = '4',
