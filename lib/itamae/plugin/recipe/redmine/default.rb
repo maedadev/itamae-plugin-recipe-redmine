@@ -61,13 +61,13 @@ template "/opt/redmine/redmine-#{version}/config/configuration.yml" do
   mode '644'
 end
 
-if ENV['GEMFILE_LOCAL'] || version == '4.1.7'
+if ENV['GEMFILE_LOCAL'] || %w{4.1.7 4.2.11}.include?(version)
   template "/opt/redmine/redmine-#{version}/Gemfile.local" do
     user 'root'
     owner ENV['USER']
     group ENV['USER']
     mode '644'
-    source ENV['GEMFILE_LOCAL'] || ::File.join(::File.dirname(__FILE__), 'templates/Gemfile.local.erb')
+    source ENV['GEMFILE_LOCAL'] || ::File.join(::File.dirname(__FILE__), "templates/#{version}/Gemfile.local.erb")
   end
 end
 
