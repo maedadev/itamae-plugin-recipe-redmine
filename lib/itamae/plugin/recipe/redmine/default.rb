@@ -3,8 +3,6 @@ version = ENV['REDMINE_VERSION'] || Itamae::Plugin::Recipe::Redmine::REDMINE_VER
 insecure = ENV['INSECURE'] ? '--no-check-certificate' : ''
 
 %w{
-  ImageMagick
-  ImageMagick-devel
   expect
   ipa-pgothic-fonts
   libcurl-devel
@@ -17,6 +15,20 @@ insecure = ENV['INSECURE'] ? '--no-check-certificate' : ''
   package name do
     user 'root'
   end
+end
+
+case "#{node.platform_family}-#{node.platform_version}"
+when /rhel-7\.(.*?)/, /rhel-8\.(.*?)/
+  %w{
+    ImageMagick
+    ImageMagick-devel
+  }.each do |name|
+    package name do
+      user 'root'
+      options '--enablerepo=epel'
+    end
+else
+  raise 'サポート対象外のOSです。'
 end
 
 directory '/opt/redmine' do
