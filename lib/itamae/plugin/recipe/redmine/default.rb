@@ -27,7 +27,7 @@ when /rhel-7\.(.*?)/, /rhel-8\.(.*?)/
       user 'root'
       options '--enablerepo=epel'
     end
- end
+  end
 else
   raise 'サポート対象外のOSです。'
 end
