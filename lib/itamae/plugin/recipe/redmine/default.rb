@@ -4,9 +4,8 @@ insecure = ENV['INSECURE'] ? '--no-check-certificate' : ''
 
 %w{
   expect
-  ipa-pgothic-fonts
   libcurl-devel
-  libffi-devel  
+  libffi-devel
   libyaml-devel
   openssl-devel
   readline-devel
@@ -18,7 +17,33 @@ insecure = ENV['INSECURE'] ? '--no-check-certificate' : ''
 end
 
 case "#{node.platform_family}-#{node.platform_version}"
-when /rhel-7\.(.*?)/, /rhel-8\.(.*?)/
+when /rhel-7\.(.*?)/
+  %w{
+    ipa-pgothic-fonts
+  }.each do |name|
+    package name do
+      user 'root'
+    end
+  end
+
+  %w{
+    ImageMagick
+    ImageMagick-devel
+  }.each do |name|
+    package name do
+      user 'root'
+      options '--enablerepo=epel'
+    end
+  end
+when /rhel-8\.(.*?)/
+  %w{
+    google-noto-sans-cjk-jp-fonts
+  }.each do |name|
+    package name do
+      user 'root'
+    end
+  end
+
   %w{
     ImageMagick
     ImageMagick-devel
