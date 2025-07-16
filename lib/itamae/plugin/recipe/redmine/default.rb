@@ -16,45 +16,43 @@ insecure = ENV['INSECURE'] ? '--no-check-certificate' : ''
   end
 end
 
-case "#{node.platform_family}-#{node.platform_version}"
-when /rhel-7\.(.*?)/
-  %w{
-    ipa-pgothic-fonts
-  }.each do |name|
+def install_fonts(fonts)
+  fonts.each do |name|
     package name do
       user 'root'
     end
   end
+end
 
-  %w{
-    ImageMagick
-    ImageMagick-devel
-  }.each do |name|
+def install_imagemagick_with_epel
+  %w[ImageMagick ImageMagick-devel].each do |name|
     package name do
       user 'root'
       options '--enablerepo=epel'
     end
   end
-when /rhel-8\.(.*?)/
-  %w{
-    google-noto-sans-cjk-jp-fonts
-  }.each do |name|
-    package name do
-      user 'root'
-    end
-  end
+end
 
-  %w{
-    ImageMagick
-    ImageMagick-devel
-  }.each do |name|
-    package name do
-      user 'root'
-      options '--enablerepo=epel'
-    end
-  end
+# platform_familyを自前で実装
+platform_family = case node.platform
+                  when 'centos', 'redhat', 'amazon', 'almalinux', 'rocky'
+                    'rhel'
+                  when 'ubuntu', 'debian'
+                    'debian'
+                  else
+                    raise "未知のplatform: #{node.platform}"
+                  end
+
+platform_key = "#{platform_family}-#{node.platform_version}"
+
+if platform_key.match?(/rhel-7\./)
+  install_fonts(%w[ipa-pgothic-fonts])
+  install_imagemagick_with_epel
+elsif platform_key.match?(/rhel-8\./)
+  install_fonts(%w[google-noto-sans-cjk-jp-fonts])
+  install_imagemagick_with_epel
 else
-  raise 'サポート対象外のOSです。'
+  raise "サポート対象外のOSです。"
 end
 
 directory '/opt/redmine' do
