@@ -16,22 +16,22 @@ insecure = ENV['INSECURE'] ? '--no-check-certificate' : ''
   end
 end
 
-def install_fonts(fonts)
+install_fonts = ->(fonts) {
   fonts.each do |name|
     package name do
       user 'root'
     end
   end
-end
+}
 
-def install_imagemagick_with_epel
+install_imagemagick_with_epel = -> {
   %w[ImageMagick ImageMagick-devel].each do |name|
     package name do
       user 'root'
       options '--enablerepo=epel'
     end
   end
-end
+}
 
 # platform_familyを自前で実装
 platform_family = case node.platform
@@ -46,11 +46,11 @@ platform_family = case node.platform
 platform_key = "#{platform_family}-#{node.platform_version}"
 
 if platform_key.match?(/rhel-7\./)
-  install_fonts(%w[ipa-pgothic-fonts])
-  install_imagemagick_with_epel
+  install_fonts.call(%w[ipa-pgothic-fonts])
+  install_imagemagick_with_epel.call
 elsif platform_key.match?(/rhel-8\./)
-  install_fonts(%w[google-noto-sans-cjk-jp-fonts])
-  install_imagemagick_with_epel
+  install_fonts.call(%w[google-noto-sans-cjk-jp-fonts])
+  install_imagemagick_with_epel.call
 else
   raise "サポート対象外のOSです。"
 end
