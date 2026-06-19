@@ -50,4 +50,5 @@ Gemfile.lock
 .rvmrc
 
 # IDE configuration files
+/.idea
 /.project
